@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { allStores } = require('../config/store');
 const { password } = require('./custom.validation');
 
 const register = {
@@ -6,6 +7,8 @@ const register = {
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
     name: Joi.string().required(),
+    restaurantCode: Joi.string().required(),
+    type:Joi.string().valid(...allStores).optional(),
   }),
 };
 

@@ -3,13 +3,22 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
-const userSchema = mongoose.Schema(
+const { storeConfig } = require('../config');
+const restaurantSchema = mongoose.Schema(
   {
     _id: { type: Number },
     name: {
       type: String,
+    },
+    restaurantCode: {
+      type: String,
       required: true,
       trim: true,
+      unique: true,
+    },
+    type: {
+      type: String,
+      enum: storeConfig.allStores,
     },
     email: {
       type: String,
@@ -51,17 +60,22 @@ const userSchema = mongoose.Schema(
 );
 
 // add plugin that converts mongoose to json
-userSchema.plugin(toJSON);
-userSchema.plugin(paginate);
-userSchema.plugin(AutoIncrement, { id: 'user_counter' });
+restaurantSchema.plugin(toJSON);
+restaurantSchema.plugin(paginate);
+restaurantSchema.plugin(AutoIncrement, { id: 'restaurant_counter' });
 /**
  * Check if email is taken
  * @param {string} email - The user's email
  * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
  * @returns {Promise<boolean>}
  */
-userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
+restaurantSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  return !!user;
+};
+
+restaurantSchema.statics.isCodeTaken = async function (restaurantCode, excludeUserId) {
+  const user = await this.findOne({ restaurantCode, _id: { $ne: excludeUserId } });
   return !!user;
 };
 
@@ -70,12 +84,12 @@ userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-userSchema.methods.isPasswordMatch = async function (password) {
+restaurantSchema.methods.isPasswordMatch = async function (password) {
   const user = this;
   return bcrypt.compare(password, user.password);
 };
 
-userSchema.pre('save', async function (next) {
+restaurantSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
@@ -86,6 +100,6 @@ userSchema.pre('save', async function (next) {
 /**
  * @typedef User
  */
-const User = mongoose.model('User', userSchema);
+const Restaurant = mongoose.model('Restaurant', restaurantSchema);
 
-module.exports = User;
+module.exports = Restaurant;
