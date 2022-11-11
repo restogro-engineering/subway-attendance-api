@@ -13,7 +13,12 @@ const employeeSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: storeConfig.allEmployeeStatuses,
+      enum: storeConfig.employeeStatusList,
+    },
+    type: {
+      type: String,
+      enum: storeConfig.employeeTypeList,
+      required: true,
     },
     startDate: {
       type: Date,
