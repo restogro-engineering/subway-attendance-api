@@ -18,7 +18,7 @@ const restaurantSchema = mongoose.Schema(
     },
     type: {
       type: String,
-      enum: storeConfig.allStores,
+      enum: storeConfig.allStoreTypeList,
     },
     email: {
       type: String,

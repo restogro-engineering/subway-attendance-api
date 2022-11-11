@@ -5,19 +5,31 @@ const storeTypes = {
   FOFO: 'FOFO',
 };
 
-const allStores = Object.values(storeTypes);
+const allStoreTypeList = Object.values(storeTypes);
 
-const employeeStatus = {
+const employeeStatuses = {
   inStore: 'In store operations',
   training: 'Training',
   inactive: 'Inactive',
 };
 
-const allEmployeeStatuses = Object.values(employeeStatus);
+const employeeStatusList = Object.values(employeeStatuses);
+
+const employeeTypes = {
+  fullTime: 'Full Time',
+  partTime: 'Part Time',
+};
+
+const employeeTypeList = Object.values(employeeTypes);
+
+const workingHours = [0, 2, 4, 6, 8];
 
 module.exports = {
   storeTypes,
-  allStores,
-  employeeStatus,
-  allEmployeeStatuses,
+  allStoreTypeList,
+  employeeStatuses,
+  employeeStatusList,
+  employeeTypes,
+  employeeTypeList,
+  workingHours,
 };

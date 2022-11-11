@@ -11,7 +11,7 @@ const tokenSchema = mongoose.Schema(
     },
     user: {
       type: Number,
-      ref: 'User',
+      ref: 'Restaurant',
       required: true,
     },
     type: {
