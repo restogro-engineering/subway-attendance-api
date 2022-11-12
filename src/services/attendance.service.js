@@ -3,8 +3,18 @@ const { Employee, Attendance } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { getWeekDifferenceBetweenTwoDates } = require('../utils/date');
 const { storeConfig } = require('../config');
-const getAttendanceByFilter = (filter) => {
-  return Attendance.find({ archive: false, ...filter });
+
+const getEmployeesByFilter = async (filter, selectionList) => {
+  if (selectionList) {
+    return Employee.find({ ...filter, archive: false })
+      .select(selectionList)
+      .sort({ _id: 1 });
+  }
+  return Employee.find({ ...filter, archive: false }).sort({ _id: 1 });
+};
+
+const getAttendanceByFilter = async (filter) => {
+  return Attendance.find({ archive: false, ...filter }).sort({ employee: 1 });
 };
 
 const getOneEmployee = async (filter) => {
@@ -21,6 +31,7 @@ const updateOneAttendance = async (filter, update) => {
 const updateAttendance = async (updateBody, restaurant) => {
   const { fullTime, partTime } = updateBody;
   const curDate = new Date();
+  const currentDay = curDate.getDay();
   curDate.setHours(0, 0, 0, 0);
   let updatedFullTimeData = fullTime.map(async (item) => {
     const { employee, details } = item;
@@ -43,6 +54,7 @@ const updateAttendance = async (updateBody, restaurant) => {
       const attendanceDate = new Date(item.attendanceDate);
       attendanceDate.setHours(0, 0, 0, 0);
       const attendanceDay = attendanceDate.getDay();
+
       const weekDifference = getWeekDifferenceBetweenTwoDates(attendanceDate, curDate);
       if (weekDifference > 1) {
         // If week difference greter than 1 than throw error
@@ -53,6 +65,9 @@ const updateAttendance = async (updateBody, restaurant) => {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
           }
         } else {
+          if (currentDay >= 5) {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
+          }
           if (attendanceDay < 3) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
           }
@@ -130,4 +145,4 @@ const updateAttendance = async (updateBody, restaurant) => {
   return { updatedFullTimeData, updatedPartTimeData };
 };
 
-module.exports = { updateAttendance, getAttendanceByFilter };
+module.exports = { updateAttendance, getAttendanceByFilter, getEmployeesByFilter };

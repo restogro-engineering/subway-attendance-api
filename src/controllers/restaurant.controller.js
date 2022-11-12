@@ -24,8 +24,15 @@ const getAttendance = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getAllEmployeeNames = catchAsync(async (req, res) => {
+  const employeeFilter = { restaurant: req.user._id };
+  const data = await attendanceService.getEmployeesByFilter(employeeFilter, 'name type');
+  res.send(data);
+});
+
 module.exports = {
   createEmployee,
   updateAttendance,
   getAttendance,
+  getAllEmployeeNames,
 };

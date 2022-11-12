@@ -16,4 +16,5 @@ router.put(
 );
 
 router.get('/get-attendance', auth(), validate(restaurantValidation.getAttendance), restaurantController.getAttendance);
+router.get('/get-all-employee-names', auth(), restaurantController.getAllEmployeeNames);
 module.exports = router;
