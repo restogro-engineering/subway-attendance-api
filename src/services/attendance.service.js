@@ -57,20 +57,29 @@ const updateAttendance = async (updateBody, restaurant) => {
 
       const weekDifference = getWeekDifferenceBetweenTwoDates(attendanceDate, curDate);
       if (weekDifference > 1) {
-        // If week difference greter than 1 than throw error
+        // If week difference greter than 1 then its not possible to edit attendance
         throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
       } else if (weekDifference === 1) {
+        // If week difference is 1, then attendate can be atleast one week ahead or behind
         if (attendanceDate > curDate) {
+          // If attendance date is one week ahead and we are trying to update attendance for wednesday or day after that
           if (attendanceDay > 2) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
           }
         } else {
+          // If we are trying to update attendance is of past week then if its Friday, then we cannot update attendance
           if (currentDay >= 5) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
           }
+          // If the day in the past week is less than Wednesday then its not possible to update attendance
           if (attendanceDay < 3) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
           }
+        }
+      } else {
+        // For the same week if we are trying if current day is Friday and we are tryting to edit attendance before wednesday
+        if (currentDay >= 5 && attendanceDate < 3) {
+          throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
         }
       }
 
@@ -121,9 +130,16 @@ const updateAttendance = async (updateBody, restaurant) => {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
           }
         } else {
+          if (currentDay >= 5) {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
+          }
           if (attendanceDay < 3) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
           }
+        }
+      } else {
+        if (currentDay >= 5 && attendanceDate < 3) {
+          throw new ApiError(httpStatus.BAD_REQUEST, 'Sorry you can update only current week attendance');
         }
       }
 
